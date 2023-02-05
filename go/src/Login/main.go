@@ -1,24 +1,23 @@
 package main
+
 import (
 	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
-	"unicode"
-
-
-
 
 	"golang.org/x/crypto/bcrypt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
+
 var tpl *template.Template
 var db *sql.DB
 
 func main() {
 	tpl, _ = template.ParseGlob("templates/*.html")
-	var err errordb, err = sql.Open("mysql", "root:password@tcp(localhost:3306)/testdb")
+	var err error
+	db, err = sql.Open("mysql", "root:password@tcp(localhost:3306)/testdb")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -37,11 +36,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // loginAuthHandler  authenticates user login
-funcloginAuthHandler(w http.ResponseWriter, r *http.Request) {
+func loginAuthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("*****loginAuthHandler running*****")
 	r.ParseForm()
 	username := r.FormValue("username")
-	password := r.Formvalue("password")
+	password := r.FormValue("password")
 	fmt.Println("username:", username, "password:", password)
 	// retrieve password from db to compare (hash) with user supplied password's hash
 	var hash string
@@ -59,10 +58,10 @@ funcloginAuthHandler(w http.ResponseWriter, r *http.Request) {
 	// return nill on success
 	if err == nil {
 		fmt.Fprint(w, "You have succcessfully logged in :)")
-		return 
+		return
 	}
 	fmt.Println("incorrect password")
-tpl.ExecuteTemplate(w, "login.html", "check username and password")
+	tpl.ExecuteTemplate(w, "login.html", "check username and password")
 }
 
 // registerHandler serves form for registring new users

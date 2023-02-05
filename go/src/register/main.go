@@ -31,24 +31,25 @@ func main() {
 // registerHandler serves form for registring new users
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("*****registerHandler running*****")
-	tpl.ExecuteTemplate(w, "register.html",nil)
+	tpl.ExecuteTemplate(w, "register.html", nil)
 }
 
 // registerAuthHandler creates new user in database
-func registerAuthHandler(w http.ResposeWriter, r *http.Request) {
+func registerAuthHandler(w http.ResponseWriter, r *http.Request) {
 	/*
-	1. check username criteria
-	2. check password criteria
-	3. check if username is already exists in database
-	4. create bcrypt hash from password
-	5. insert username and password hash in databse
-	(email validation will be in another video)
+		1. check username criteria
+		2. check password criteria
+		3. check if username is already exists in database
+		4. create bcrypt hash from password
+		5. insert username and password hash in databse
+		(email validation will be in another video)
 	*/
 	fmt.Println("*****registerAuthHandler running*****")
 	r.ParseForm()
 	username := r.FormValue("username")
 	// check username for only alphaNumeric characters
 	var nameAlphaNumeric = true
+	_ = nameAlphaNumeric
 	for _, char := range username {
 		//func IsLetter(r rune) bool, func IsNumber(r rune) bool
 		// if !unicode.IsLetter(char) && !unicode.IsNumber(char)
@@ -58,18 +59,21 @@ func registerAuthHandler(w http.ResposeWriter, r *http.Request) {
 	}
 	// check username pswdLength
 	var nameLength bool
+	_ = nameLength
 	if 5 <= len(username) && len(username) <= 50 {
-		nameLength = true 
+		nameLength = true
 	}
 	// check password criteria
 	password := r.FormValue("password")
 	fmt.Println("password:", password, "\npswdLength:", len(password))
 	// variables that must pass for password creation criteria
 	var pswdLowercase, pswdUppercase, pswdNumber, pswdSpecial, pswdLength, pswdNoSpaces bool
-	pswdNoSpace = true
+	var pswdNoSpace = true
+	_ = pswdNoSpaces
+
 	for _, char := range password {
-		swith {
-			// func IsLower(r rune) bool
+		switch {
+		// func IsLower(r rune) bool
 		case unicode.IsLower(char):
 			pswdLowercase = true
 			// func IsUpper(r rune) bool
@@ -77,17 +81,17 @@ func registerAuthHandler(w http.ResposeWriter, r *http.Request) {
 			pswdUppercase = true
 			// func IsNumber(r rune) bool
 		case unicode.IsNumber(char):
-			pswdNumber = true 
+			pswdNumber = true
 			// func IsPunct(r rune) bool, func IsSymbol(r rune) bool
 		case unicode.IsPunct(char) || unicode.IsSymbol(char):
 			pswdSpecial = true
 			// func IsSpace(r rune) bool, type rune = int32
 		case unicode.IsSpace(int32(char)):
-			pswdNoSpaces = false 
+			pswdNoSpaces = false
 		}
 	}
-	if 11 < len(password) && len (password) <60 {
-		pswdLength = true 
+	if 11 < len(password) && len(password) < 60 {
+		pswdLength = true
 	}
 	fmt.Println("pswdLowercase:", pswdLowercase, ":\npswdUppercase:", pswdUppercase, "\npswdNumber:", pswdNumber)
 	if !pswdLowercase || !pswdUppercase || !pswdNumber || !pswdSpecial || !pswdLength || !pswdNoSpace {
@@ -101,7 +105,7 @@ func registerAuthHandler(w http.ResposeWriter, r *http.Request) {
 	err := row.Scan(&uID)
 	if err != sql.ErrNoRows {
 		fmt.Println("username already exists, err:", err)
-		tpl.ExecuteTemplare(w, "register.html", "username already taken")
+		tpl.ExecuteTemplate(w, "register.html", "username already taken")
 		return
 	}
 	// create hash from password
@@ -116,7 +120,7 @@ func registerAuthHandler(w http.ResposeWriter, r *http.Request) {
 	fmt.Println("hash:", hash)
 	fmt.Println("string(hash):", string(hash))
 	// func (db *DB) Prepare(query string) (*Stmt, error)
-	var insertStmt *sql.Stmt 
+	var insertStmt *sql.Stmt
 	insertStmt, err = db.Prepare("INSERT INTO bcrypt (Username, Hash) VALUES (?, ?);")
 	if err != nil {
 		fmt.Println("error preparing statement:", err)
